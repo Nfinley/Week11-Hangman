@@ -1,0 +1,28 @@
+{
+  "name": "week-11_hangman",
+  "version": "1.0.0",
+  "description": "hangman game created in node.js",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nfinley/Week11-Hangman.git"
+  },
+  "keywords": [
+    "node",
+    "hangman"
+  ],
+  "author": "Nigel Finley",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nfinley/Week11-Hangman/issues"
+  },
+  "homepage": "https://github.com/Nfinley/Week11-Hangman#readme",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "colors": "^1.1.2",
+    "inquirer": "^1.2.2"
+  }
+}
