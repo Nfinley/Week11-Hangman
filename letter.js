@@ -7,13 +7,30 @@
 var game = require('./game.js');
 
 
+// ======== EXAMPLE FROM CLASS ======
+ 
+var Word = require('./letter.js');
 
-function Letters(letterGuessed, correctGuess){
-	this.letterGuessed = letterGuessed;
-	this.correctGuess = correctGuess;
-	// this.guessesLeft = 8;
-	// function that checks user guess if in current word
-	// function that pushes
+// word constructor
+function Letter (value){
+	// this is just the character - the user guess
+	this.value = value; 
+	this.visible = false;
 }
 
-module.exports  = {Letters: Letters};
+// this either shows or hides the word
+Letter.prototype.show = function() {
+	// this is a ternary operator
+	return (this.visible) ? this.value : " _ ";
+}
+
+module.exports  = Letter;
+
+
+// function Letters(letterGuessed, correctGuess){
+// 	this.letterGuessed = letterGuessed;
+// 	this.correctGuess = correctGuess;
+// 	// this.guessesLeft = 8;
+// 	// function that checks user guess if in current word
+// 	// function that pushes
+// }

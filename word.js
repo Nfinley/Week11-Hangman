@@ -1,41 +1,111 @@
 // This will be the constructor file
 // word.js should contain all of the methods which will check 
 // ...the letters guessed versus the random word selected.
+"use strict";
 
-var game = require('./game.js');
+const Letter = require('./letter.js');
 
 
 
+class Word {
+    constructor(value) {
+        this.value = value;
+        // console.log(value);
+        // an array of Letter objects that represents our word
+        this.letters = value
+            .split("")
+            .map(v => new Letter(v));
+    }
+    displayWord() {
+        // takes letters, calls .show on each one, collects them into a new array, calls .join to return a string
+        var word = this.letters
+            .map(v => v.show()).join("");
+        // console.log(word);
+        return word;
+    }
 
-function CheckGuess(correctLetter){
-	this.guess = guess; 
-	this.currentWordArray = game.randomWord().split("");
-	// should be an array of single letters
-	this.checkWordGuess = function(){
-		// check the guess against the current word array
-        	game.currentWordArray.forEach(function(letter, i, array){
-        		console.log(letter, i);
-        		
-        		// var index = array.indexOf(userGuess);
-        		if(userGuess === letter){
-        			game.blanksArray.splice(i, 1, letter);
-        			console.log("Found letter ", letter);
-        			console.log("index: " + i);
+	// modify any correctly guessed letter to set visible to true
+	// then it will return true or false depending on if a correct letter was guessed.
+    playerGuess(guess) {
+        this.letters.map(function(letter) {
+            if (guess === letter.value) {
+                letter.visible = true;
+                return true;
+            } else {
+                return false;
+            }
+        })
+        // tests whether some element in the array passes the test
+        .some(function(v) {
+            return v;
 
-        		}
-        		
-        	});
+        })
+    }
+	// Return true or false depending on if the word has been conpletely guessed. 
+	// If the 
+    roundFinished() {
+    	return this.displayWord() === this.value;
+    	// return result;
+    	// if (this.displayWord() == this.value){
+    	// 	console.log('true');
+
+    	// } else { 
+    	// 	console.log('false');
+    	// }
+    	
 	}
-	this.pickedWordArray = game.initialPick;
-	this.correctLetter = correctLetter;
-	this.userGuessArray =[];
 
-	// an array to store the generated word
-	// function to split the word into a string of letters take initialPick and split it
-	// functoin to take the terminal input and match it against the array
+
 }
 
-module.exports = {CheckGuess: CheckGuess};
 
-// initialPick = game.randomWord();
-// currentWord = initialPick.split("");
+
+
+// // modify any correctly guessed letter to set visible to true
+// // then it will return true or false depending on if a correct letter was guessed.
+// Word.prototype.guess = function(guess) {
+//     this.letters.map(function(l) {
+//             if (guess === l.value) {
+//                 l.visible = true;
+//                 return true;
+//             } else {
+//                 return false;
+//             }
+//         })
+//         // tests whether some element in the array passes the test
+//         .some(function(v) {
+//             return v;
+
+//         })
+// }
+
+// Return true or false depending on if the word has been conpletely guessed. 
+Word.prototype.finished = function() {
+    return this.show() === this.value;
+}
+
+
+module.exports = Word;
+
+// ========= MY old code =============
+// 
+// function CheckGuess(correctLetter){
+
+// 	// should be an array of single letters
+// 	this.checkWordGuess = function(){
+// 		// check the guess against the current word array
+//         	game.currentWordArray.forEach(function(letter, i, array){
+//         		console.log(letter, i);
+
+//         		// var index = array.indexOf(userGuess);
+//         		if(userGuess === letter){
+//         			game.blanksArray.splice(i, 1, letter);
+//         			console.log("Found letter ", letter);
+//         			console.log("index: " + i);
+
+//         		}
+
+//         	});
+// 	}
+
+// }
