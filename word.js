@@ -6,9 +6,10 @@
 const Letter = require('./letter.js');
 
 
-
+// Using ES6 class and constructor properties
 class Word {
     constructor(value) {
+    	// the generated word
         this.value = value;
         // console.log(value);
         // an array of Letter objects that represents our word
@@ -45,44 +46,13 @@ class Word {
 	// If the 
     roundFinished() {
     	return this.displayWord() === this.value;
-    	// return result;
-    	// if (this.displayWord() == this.value){
-    	// 	console.log('true');
-
-    	// } else { 
-    	// 	console.log('false');
-    	// }
-    	
+	
 	}
 
 
 }
 
 
-
-
-// // modify any correctly guessed letter to set visible to true
-// // then it will return true or false depending on if a correct letter was guessed.
-// Word.prototype.guess = function(guess) {
-//     this.letters.map(function(l) {
-//             if (guess === l.value) {
-//                 l.visible = true;
-//                 return true;
-//             } else {
-//                 return false;
-//             }
-//         })
-//         // tests whether some element in the array passes the test
-//         .some(function(v) {
-//             return v;
-
-//         })
-// }
-
-// Return true or false depending on if the word has been conpletely guessed. 
-Word.prototype.finished = function() {
-    return this.show() === this.value;
-}
 
 
 module.exports = Word;

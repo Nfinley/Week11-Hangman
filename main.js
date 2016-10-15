@@ -2,30 +2,31 @@
 // main.js will contain the logic of your app. Running it in Terminal/Bash will start the game.
 // The app should end when a player guesses the correct word or runs out of guesses.
 
-// TO DO : 
-// right now it can only go two rounds because the letter held within the array doesn't change (the index)
-// It is not switching the word that the splice function references
 
+
+// ======= Required modules ========
 // This file create the random word
 var Game = require('./game.js');
-// This file stores the
+// This file stores the word
 var Word = require('./word.js');
-var Letter = require('./letter.js');
 
-// node modules
+
+// ========= Node modules ==========
 var inquirer = require('inquirer');
 var colors = require('colors');
 
+// ========= GAME VARIABLES ===============
 var border = "";
 var blanks = "";
 var userGuess;
-var guessesLeft = 8;
+var guessesLeft = 10;
 var lettersGuessed = [];
 var wins = 0;
 var losses = 0;
 
-var WORDARRAY = ["harmony", "melody", "chord", "third", "fifth", "triad"];
-// var WORDARRAY = ["triad", "test"];
+// The game array
+var WORDARRAY = ["harmony", "melody", "chord", "third", "fifth", "triad", "seventh", "tritone"];
+
 
 // setting variable game to a new instace of Game and passing the entire array as a parameter
 var game = new Game(WORDARRAY);
@@ -39,29 +40,107 @@ var word = new Word(generatedWord);
 // setting the variable index to the index of the generated word
 var index = WORDARRAY.indexOf(generatedWord);
 
-// ====== INITIAL FUNCTIONS ======
+// ====== GAME FUNCTIONS ======
 function printInfo() {
-    //     game.blanksArray.forEach(function(blank, index) {
-    //         border += "***".green;
-    //         blanks += " _ ".magenta;
-    //     });
-    console.log("\n**********************************************".green + border + "\n");
-
-    console.log("You current word: ".red + word.displayWord().magenta + "\n");
-
-    console.log("**********************************************".green + border + "\n");
-    console.log("Guesses remaining: " + guessesLeft + " | " + "Letters Guessed: " + lettersGuessed.join(" ").rainbow + "\n");
+    console.log('\033c');
+    console.log("\nWelcome to terminal hangman!\n".bold.red + "\nToday's catagory is " + "musical theory".rainbow + "\n");
+    console.log("\n***********************************************".green);
+    console.log("|                                             |".green);
+    console.log("|".green + "  You current word: ".red + word.displayWord().magenta);
+    console.log("|                                             |".green);
+    console.log("***********************************************".green + "\n");
+    console.log("Guesses remaining: ".blue + guessesLeft + " | " + "Letters Guessed: ".blue + lettersGuessed.join(" ").rainbow + "\n");
     console.log("Wins: ".green + wins + " | " + "Losses: ".yellow + losses + "\n");
+}
 
+// function that re-intializes the word after a word is guessed or guesses run out
+function gameReset() {
+
+    index = "";
+    game = new Game(WORDARRAY);
+    generatedWord = game.pickRandomWord();
+    word = new Word(generatedWord);
+    index = WORDARRAY.indexOf(generatedWord);
+    lettersGuessed = [];
+    guessesLeft = 10; // re-initialize the guesses left 
+    printInfo();
+    guess();
+
+}
+
+// function that handles the logic when the user guesses the correct word
+function correctWord() {
+    // Calls the roundFinished function if the entire word is guessed
+    if (word.roundFinished()) {
+        // If the index is not out of bounds (-1) then take the word out of the word array
+        if (index != -1) {
+            WORDARRAY.splice(index, 1);
+        }
+        // if the worr adday is = 0 then the game is over and message is displayed
+        if (WORDARRAY.length === 0) {
+            console.log("\nCongrats you guessed all of the words, GAME OVER!\n".rainbow);
+            return;
+        }
+        wins += 1;
+        // inquirer to ask user if they want to play again after guessing the right word
+        inquirer.prompt([{
+            name: "replay",
+            message: "Nice work! You guessed the word, play again (Y/N)",
+            type: "input",
+            validate: function(input) {
+                if (input === 'Y' || input === 'y' || input === 'n' || input === 'N') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }]).then(function(answers) {
+            if (answers.replay === 'Y' || answers.replay === 'y') {
+                // NEED TO recall  the new word generator and their functions
+                gameReset();
+
+            } else {
+            	// If the user selects no then the game and and the message below is displayed
+                console.log("Thank you for playing. Good Bye!".magenta);
+            }
+        });
+        return;
+
+    }
+    guess();
+}
+
+
+// The function that handles all of the logic when the guesses run out
+function incorrectWord() {
+    losses += 1;
+    inquirer.prompt([{
+        name: "playagain",
+        message: "You have no more guesses, play again (Y/N)",
+        type: "input",
+        validate: function(input) {
+            if (input === 'Y' || input === 'y' || input === 'n' || input === 'N') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }]).then(function(answers) {
+        if (answers.playagain === 'Y' || answers.playagain === 'y') {
+            // NEED TO recall  the new word generator and their functions
+            gameReset();
+
+        } else {
+
+            console.log("Thank you for playing. Good Bye!".magenta);
+        }
+    });
 
 }
 
 
-
-// ======= LOAD GAME ======
-console.log("\nWelcome to terminal hangman!".bold.red + "\nToday's catagory is " + "musical theory".rainbow + "\n");
+// ============== PLAY GAME ============
 printInfo();
-console.log(generatedWord);
 
 // Start the game using inquirer
 function guess() {
@@ -70,7 +149,14 @@ function guess() {
     inquirer.prompt([{
         name: "guess",
         message: "Guess a letter",
-        type: "input"
+        type: "input",
+        validate: function(input) {
+            if (input.match(/[A-Za-z]+/)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }]).then(function(answers) {
         userGuess = answers.guess;
         if (guessesLeft > 1) {
@@ -86,139 +172,17 @@ function guess() {
             // Re-prints the word in the new state
             printInfo();
 
+            // calls the function the handles the logic when a correct word is guessed
+            correctWord();
 
-            // Calls the roundFinished function if the entire word is guessed
-            if (word.roundFinished()) {
-
-                // setting the variable index to the index of the generated word
-                // index = WORDARRAY.indexOf(generatedWord);
-                console.log("current word: " + generatedWord);
-                    // If the index is not out of bounds (-1) then take the word out of the word array
-                if (index != -1) {
-                    WORDARRAY.splice(index, 1);
-                    console.log("Word index #: " + index);
-                    console.log("WORDARRAY in splice: " + WORDARRAY);
-                } if (WORDARRAY.length === 0){
-                    console.log("Word index #: " + index);
-
-                    console.log("\nCongrats you guessed all of the words, GAME OVER!\n".rainbow);
-                    return;
-                }
-                wins += 1;
-                inquirer.prompt([{
-                    name: "replay",
-                    message: "Nice work! You guessed the word, play again (Y/N)",
-                    type: "input",
-                    validate: function(input) {
-                        if (input === 'Y' || input === 'y' || input === 'n' || input === 'N') {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }]).then(function(answers) {
-                    if (answers.replay === 'Y' || answers.replay === 'y') {
-                        // NEED TO recall  the new word generator and their functions
-                        index = "";
-                        game = new Game(WORDARRAY);
-                        generatedWord = game.pickRandomWord();
-                        word = new Word(generatedWord);
-                        index = WORDARRAY.indexOf(generatedWord);
-                        lettersGuessed =[];
-                        guessesLeft = 8; // re-initialize the guesses left 
-                		console.log("NEW current word: " + generatedWord);
-
-                        printInfo();
-                        
-
-                        guess();
-                    } else {
-
-                        console.log("Thank you for playing. Good Bye!".magenta);
-                    }
-                });
-                return;
-
-            }
-
-            guess();
             // If guesses left equals to zero it goes to this else statement to ask if user wants to play again
         } else {
             // console.log("else statment");
-            losses += 1;
-            inquirer.prompt([{
-                name: "playagain",
-                message: "You have no more guesses, play again (Y/N)",
-                type: "input",
-                validate: function(input) {
-                    if (input === 'Y' || input === 'y' || input === 'n' || input === 'N') {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }]).then(function(answers) {
-                if (answers.playagain === 'Y' || answers.playagain === 'y') {
-                    // NEED TO recall  the new word generator and their functions
-	                console.log("WORDARRAY in no answer left: " + WORDARRAY);
-                    index = "";      
-                    game = new Game(WORDARRAY);
-                    generatedWord = game.pickRandomWord();
-                    word = new Word(generatedWord);
-                    index = WORDARRAY.indexOf(generatedWord);
-                    lettersGuessed =[];
-                    guessesLeft = 8; // re-initialize the guesses left 
-                	console.log("NEW current word: " + generatedWord);
-
-                    printInfo();
-                    guess();
-                } else {
-
-                    console.log("Thank you for playing. Good Bye!".magenta);
-                }
-            });
+            incorrectWord();
 
         }
-        // if(typeof answers.guess !== 'number'){
-        // 	// Run all of the functions to check
-        // 	// Create if statement for CORRECT GUESS
-        // 	 	// subset if for Win if(correctWord !== userWord)
-
-        // 	// Create if statement for incorrect guess
-
-
-        // 	console.log(answers.guess);
-        // 	console.log(game.currentWordArray);
-        // 	// console.log(game.WORDARRAY);
-
-
-        // 	// console.clear();
-
-        // } else {
-        // 	console.log("You cannot guess a number please guess a letter");
-
-        // }
-
-        // guess();
 
     });
-    // } else {
-    // 	// Print the win message house in word
-    // 	printWin();
-    // }
+
 }
 guess();
-
-
-// Call the generate word function
-// Display the number of blanks of the word pulled from th letter.js file
-// Display prompt from letter file that says "Enter a letter " + "You have X guesses left" 
-
-// 
-
-// Game play
-// User enters letter and check to see if matched to word
-// If yes replace the dash with the word decrement guess
-// If no add the letter the the letters guessed: (this will be added after the first guess) and decrement guess
-// If user runs out of guesses it gives user a message saying game over, play again?
-// If user guesses word correctly it displays a message sayin you won, play again?

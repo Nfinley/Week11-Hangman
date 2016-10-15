@@ -4,8 +4,7 @@
 
 // this will display the blank letters in the console
 
-var game = require('./game.js');
-
+// Used the function as a constructor and using prototype 
 
 // ======== EXAMPLE FROM CLASS ======
  
